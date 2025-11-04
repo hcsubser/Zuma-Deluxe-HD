@@ -42,7 +42,9 @@ typedef struct _Game {
 	bool isFirstTime, isLosed, isWon, isIntroEnded, isOutroEnded;
 	float headerFontScale, subHeaderFontScale;
 
-	BallChain chain;
+	BallChain chain[2];
+	//BallChain chain2;
+	
 	BulletsArr bullets;
 	Messages msgs;
 	Particles particles;
