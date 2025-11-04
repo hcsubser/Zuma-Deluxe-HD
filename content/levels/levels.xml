@@ -359,7 +359,7 @@ L3 = triangle,coaster,squaresville,tunnellevel,serpents,overunder,inversespiral
 -->
 
 <StageProgression
-	stage1 = "spiral,claw,riverbed,targetglyph,turnaround,longrange,tiltspiral,underover,warshak,loopy,groovefest,spaceinvaders,triangle,coaster,squaresville,tunnellevel,overunder,inversespiral"
+	stage1 = "spiral,claw,riverbed,targetglyph,turnaround,longrange,tiltspiral,underover,warshak,loopy,groovefest,spaceinvaders,triangle,coaster,squaresville,tunnellevel,overunder,inversespiral, blackswirley"
 	diffi1 = "lvl11,lvl12,lvl13,lvl14,lvl15"
 	stage2 = "tiltspiral,underover,warshak,loopy,snakepit"
 	diffi2 = "lvl21,lvl22,lvl23,lvl24,lvl25"

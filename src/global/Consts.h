@@ -2,7 +2,7 @@
 #define CONSTS_H
 
 #define SOUNDS_SFX_COUNT 6
-#define TEXTURES_COUNT 22 
+#define TEXTURES_COUNT 23 
 #define SOUNDS_COUNT 38
 #define FONTS_COUNT 9
 
@@ -12,26 +12,6 @@ const char *filesTextures[TEXTURES_COUNT] = {
     "gameinterface.png",
     "menu.png",
 
-#if defined(_WIN64) || defined(__WIN32)
-    "thumbnails\\thumb (1).jpg",
-    "thumbnails\\thumb (2).jpg",
-    "thumbnails\\thumb (3).jpg",
-    "thumbnails\\thumb (4).jpg",
-    "thumbnails\\thumb (5).jpg",
-    "thumbnails\\thumb (6).jpg",
-    "thumbnails\\thumb (7).jpg",
-    "thumbnails\\thumb (8).jpg",
-    "thumbnails\\thumb (9).jpg",
-    "thumbnails\\thumb (10).jpg",
-    "thumbnails\\thumb (11).jpg",
-    "thumbnails\\thumb (12).jpg",
-    "thumbnails\\thumb (13).jpg",
-    "thumbnails\\thumb (14).jpg",
-    "thumbnails\\thumb (15).jpg",
-    "thumbnails\\thumb (16).jpg",
-    "thumbnails\\thumb (17).jpg",
-    "thumbnails\\thumb (18).jpg",
-#else
     "./thumbnails/thumb (1).jpg",
     "./thumbnails/thumb (2).jpg",
     "./thumbnails/thumb (3).jpg",
@@ -50,7 +30,9 @@ const char *filesTextures[TEXTURES_COUNT] = {
     "./thumbnails/thumb (16).jpg",
     "./thumbnails/thumb (17).jpg",
     "./thumbnails/thumb (18).jpg",
-#endif
+    "./thumbnails/thumb (19).jpg",
+
+
 };
 
 const char *filesSounds[SOUNDS_COUNT] = {

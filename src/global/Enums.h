@@ -1,7 +1,7 @@
 #ifndef ENUMS_H
 #define ENUMS_H
 
-#define LEVELS_COUNT 18
+#define LEVELS_COUNT 19
 
 enum _TextureID {
 	TEX_FROG,

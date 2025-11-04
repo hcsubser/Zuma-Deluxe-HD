@@ -60,7 +60,10 @@ typedef struct _Game {
 	Treasure treasure;
 
 	SDL_FPoint finishPos;
+	SDL_FPoint finish2Pos;
+
 	Animation finishAnim;
+	Animation finish2Anim;
 
 	SDL_Rect scoreRect;
 
