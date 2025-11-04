@@ -786,7 +786,7 @@ void Game_UpdateIntro(Game* game) {
 void Game_DrawIntro(Game* game) {
     Particles_Draw(&game->particles);
 
-    char buff[16];
+    char buff[48];
     SDL_Color color = {255, 255, 255, 255};
 
     sprintf(buff, "%s", game->graphics->dispName);
