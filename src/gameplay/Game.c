@@ -65,7 +65,7 @@ void Game_Init(Game* game, int lvlID, int difficulty) {
     Frog_Init(&game->frog, (game->graphics->frogPos.x + 106) * engine.scale_x, 
         game->graphics->frogPos.y * engine.scale_y);
 
-    BallChain_Init(&game->chain, game->lvl, game->settings);
+    BallChain_Init(&game->chain, game->lvl->spiralStart, game->settings);
 
     for(int i = 0; i < BULLETS_ARR_MAX_LEN; i++)
         game->bullets.bullets[i].onScreen = 0;
@@ -233,17 +233,17 @@ static void _Game_GenerateChain(Game* game) {
 
     if (game->isFirstTime && game->chain.len < game->settings->ballStartCount) {
         if (game->chain.balls[game->chain.len-1].pos >= 0.5) {
-            BallChain_Append(&game->chain, game->lvl, game->settings);
+            BallChain_Append(&game->chain, game->lvl->spiralStart, game->settings);
             game->chain.balls[game->chain.len-1].spd = game->chain.balls[game->chain.len-2].spd;
         }
     } else {
         if (game->chain.balls[game->chain.len-1].pos >= BALLS_CHAIN_PAD) {
-            BallChain_Append(&game->chain, game->lvl, game->settings);
+            BallChain_Append(&game->chain, game->lvl->spiralStart, game->settings);
             game->chain.balls[game->chain.len-1].spd = game->chain.balls[game->chain.len-2].spd;
             game->chain.balls[game->chain.len-1].startAnim = true;
             Ball_InitAnim(&game->chain.balls[game->chain.len-1]);
         } else if (game->chain.len == 0) {
-            BallChain_Append(&game->chain, game->lvl, game->settings);
+            BallChain_Append(&game->chain, game->lvl->spiralStart, game->settings);
         }
 
         if (game->isFirstTime) {
