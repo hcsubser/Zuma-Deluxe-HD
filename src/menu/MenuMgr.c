@@ -676,6 +676,10 @@ void DialogueBox_UpdateOptions(DialogueBox* db) {
 
     if (CheckBox_IsClicked(&db->chBoxes[0])) {
         if (CheckBox_IsChecked(&db->chBoxes[0])) {
+			/*SDL_DisplayMode dm;
+			dm.w = 1680;
+			dm.h = 1050;
+			SDL_SetWindowDisplayMode(engine.win,&dm);*/
             SDL_SetWindowFullscreen(
                 engine.win, SDL_WINDOW_FULLSCREEN);
             engine.fullScr = true;

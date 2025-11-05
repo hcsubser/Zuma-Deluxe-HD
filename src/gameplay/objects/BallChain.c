@@ -138,7 +138,9 @@ char BallChain_CollidesFront(BallChain* ballChain, int idx, int collideDist) {
 void BallChain_Append(BallChain* ballChain, SDL_FPoint spiral_start, LevelSettings* settings) {
 	bool isSingle = 0;
 	char color;
-	if (ballChain->balls[ballChain->len-1].isSingle) {
+	if(ballChain->len == 0)
+		color = randInt(0, ballChain->ballColors - 1);
+	else if (ballChain->balls[ballChain->len-1].isSingle) {
 		color = ballChain->balls[ballChain->len-1].color;
 		while (color == ballChain->balls[ballChain->len-1].color)
 			color = randInt(0, ballChain->ballColors - 1);

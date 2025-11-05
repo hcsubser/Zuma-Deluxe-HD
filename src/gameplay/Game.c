@@ -283,13 +283,12 @@ static void _Game_HandleGameWon(Game* game) {
         game->score <= game->settings->gaugeScore ||
         game->isWon
     ) {
-		if(game->lvl->spiral2!=NULL){
-			if (game->chain[1].isEndReached || game->chain[1].len != 0)
-			return;
-		} else
 			return;
     }
-
+	if(game->lvl->spiral2!=NULL){
+			if (game->chain[1].isEndReached || game->chain[1].len != 0)
+				return;
+	} 
 
     Engine_PlayMusic(MUS_WIN);
 
@@ -454,7 +453,7 @@ void Game_Update(Game* game, int* inMenu, int mouseClicked) {
 	        game->chain[1].isGenerating = 0;
 	        game->chain[1].isGlowing = 1;
 	        game->chain[1].glowTime = clock();
-	        Engine_PlaySound(SND_CHANT4);
+	        //Engine_PlaySound(SND_CHANT4);
 		}
 	}
 
@@ -470,6 +469,14 @@ void Game_Update(Game* game, int* inMenu, int mouseClicked) {
         game->dbMenu = DialogueBox_CreateMenu();
     }
 
+	//get all available colors from both chains
+	bool colorInChain[6];
+	memcpy(colorInChain, game->chain[0].colorInChain, 6 * sizeof(bool) );
+	if(game->lvl->spiral2 != NULL){
+			for(int i=0;i<6;i++)
+				colorInChain[i] = colorInChain[i] || game->chain[1].colorInChain[i];
+	}
+
     if (isShooted && !(int)game->frog.shift && game->btnMenu.state != BTN_CLICKED) {
         BulletsArr_AddBullet(&game->bullets, &game->frog);
         Engine_PlaySound(SND_FIREBALL1);
@@ -477,22 +484,24 @@ void Game_Update(Game* game, int* inMenu, int mouseClicked) {
         game->frog.isShooted = 1;
         game->frog.color = game->frog.nextColor;
         game->frog.nextColor = randInt(0, game->chain[0].ballColors-1);
-        while(!game->chain[0].colorInChain[game->frog.nextColor]) //TODO chain2
+        while(!colorInChain[game->frog.nextColor]) 
             game->frog.nextColor = randInt(0, game->chain[0].ballColors-1);
     }
 
     // Changing frog color if color not in chain
-    if (!(game->isLosed || game->isWon || game->chain[0].isEndReached) //TODO chain2
-        && (!game->chain[0].colorInChain[game->frog.nextColor] || !game->chain[0].colorInChain[game->frog.color])) {
-        while(!game->chain[0].colorInChain[game->frog.nextColor])
-            game->frog.nextColor = randInt(0, game->chain[0].ballColors-1);
-
-        while(!game->chain[0].colorInChain[game->frog.color])
-            game->frog.color = randInt(0, game->chain[0].ballColors-1);
-    }
-
-
-    if (game->chain[0].balls[BallChain_GetLastMovingBall(&game->chain[0])].pos > game->lvl->spiralLen * SLOWFACTOR_POS) { //TODO chain2
+    if (!game->chain[0].isGenerating){ // I dont think i need to check both chains. This is needed so we dont get stuck in loop when there are no balls on screen
+	    if (!(game->isLosed || game->isWon || game->chain[0].isEndReached) 
+	        && (!colorInChain[game->frog.nextColor] || !colorInChain[game->frog.color])) {
+	        while(!colorInChain[game->frog.nextColor])
+	            game->frog.nextColor = randInt(0, game->chain[0].ballColors-1);
+	
+	        while(!colorInChain[game->frog.color])
+	            game->frog.color = randInt(0, game->chain[0].ballColors-1);
+	    }
+	}
+    
+	//slowdown when near end
+    if (game->chain[0].balls[BallChain_GetLastMovingBall(&game->chain[0])].pos > game->lvl->spiralLen * SLOWFACTOR_POS) { 
         if (game->chain[0].isEndReached)
             game->chain[0].speed = ROLLING_TO_PIT_SPEED;
         else
@@ -500,6 +509,18 @@ void Game_Update(Game* game, int* inMenu, int mouseClicked) {
     }
     else
         game->chain[0].speed = game->settings->ballSpd;
+    
+    //chain2 slowdown
+    if(game->lvl->spiral2 != NULL){
+		if (game->chain[1].balls[BallChain_GetLastMovingBall(&game->chain[1])].pos > game->lvl->spiral2Len * SLOWFACTOR_POS) { 
+	        if (game->chain[1].isEndReached)
+	            game->chain[1].speed = ROLLING_TO_PIT_SPEED;
+	        else
+	            game->chain[1].speed = game->settings->ballSpd / game->settings->slowFactor;
+	    }
+	    else
+	        game->chain[1].speed = game->settings->ballSpd;
+	}
     
     BulletsArr_CollideWithChainUpdate(&game->bullets, &game->chain[0], game->lvl->spiral);
     if(game->lvl->spiral2 != NULL)
@@ -531,10 +552,9 @@ void Game_Draw(Game* game) {
         return;
     } 
     
-    /* clang correctly detected this will always be false. 
-     * if (!game->graphics->textureTopLayerFile)
-     */
-
+    // clang correctly detected this will always be false. 
+    // if (!game->graphics->textureTopLayerFile)
+    
     BallChain_Draw(&game->chain[0], false);
 	if(game->lvl->spiral2!=NULL)
 		BallChain_Draw(&game->chain[1], false);
@@ -824,7 +844,7 @@ void Game_UpdateIntro(Game* game) {
 
         game->lightTrailTime = ((float)clock())/CLOCKS_PER_SEC;
         return;
-    }
+    }//TODO add particles for second chain
 
     Particles_Update(&game->particles, SPARKLE_LAST_FRAME, SPARKLES_ANIM_SPEED);
 
