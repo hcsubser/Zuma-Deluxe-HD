@@ -33,6 +33,13 @@
 
 #define RAD_TO_DEG 180/M_PI
 
+enum BallType{
+	BALL_TYPE_NORMAL,
+	BALL_TYPE_PAUSE,
+	BALL_TYPE_EXPLOSIVE,
+	BALL_TYPE_BACKWARD,
+	BALL_TYPE_LASER
+};
 
 typedef struct _Ball {
 	char color, bonus;
@@ -40,6 +47,7 @@ typedef struct _Ball {
 		isSingle, inTunnel, drawPrority, startAnim;
 	float pos, x, y, dx, dy, spd;
 	int combo;
+	BallType ballType;
 	double ang;
 	Animation anim;
 } Ball;

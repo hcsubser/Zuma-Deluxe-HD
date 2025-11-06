@@ -181,11 +181,20 @@ void BallChain_Append(BallChain* ballChain, SDL_FPoint spiral_start, LevelSettin
 }
 
 void BallChain_Update(BallChain* ballChain, SpiralDot* spiral, int spiralLen, int* score, Messages* msgs) {
+	//glowing is when "ZUMA" sound is played
+	if (ballChain->isGlowing) {
+		float delta = ((float)(clock() - ballChain->glowTime))/CLOCKS_PER_SEC*1.6;//tryna make it as close as possible to original
+		if (delta > BALLCHAIN_BLINK_TIME)
+			ballChain->isGlowing = 0;
+	}
+	//movement code I suppose (applies per ball duuh)
 	for (int i = ballChain->len-1; i >= 0; i--) {
 		Ball* ball = &ballChain->balls[i];
+		
+		if(ballChain->isGlowing)
+			ball->spd= -ballChain->speed*2;
 
-
-		if (i == ballChain->len-1) {
+		if (i == ballChain->len-1 && !ballChain->isGlowing) {
 			if (ballChain->speed == ROLLING_TO_PIT_SPEED)
 				ball->spd = ROLLING_TO_PIT_SPEED;
 			else 
@@ -392,11 +401,6 @@ void BallChain_Update(BallChain* ballChain, SpiralDot* spiral, int spiralLen, in
 	}
 	BallChain_UpdateColorInChain(ballChain);
 	BallChain_UpdateCombos(ballChain);
-
-	if (ballChain->isGlowing) {
-		float delta = ((float)(clock() - ballChain->glowTime))/CLOCKS_PER_SEC;
-		if (delta > BALLCHAIN_BLINK_TIME) ballChain->isGlowing = 0;
-	}
 }
 
 void BallChain_UpdateCombos(BallChain* ballChain) {
