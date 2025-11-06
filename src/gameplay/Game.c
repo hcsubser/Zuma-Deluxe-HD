@@ -431,8 +431,9 @@ void Game_Update(Game* game, int* inMenu, int mouseClicked) {
     if(game->lvl->spiral2!=NULL)
 		BallChain_Update(&game->chain[1], game->lvl->spiral2, game->lvl->spiral2Len, &game->score, &game->msgs);
     
-    //FIXME: bullets are faster when playing levels with to chains
+    //FIXME: bullets are faster when playing levels with 2 chains
     if (game->chain[0].len > 0) {
+		//if(game->lvl->spiral2 != NULL)
         BulletsArr_UpdateOnScreenStatus(&game->bullets, &game->chain[0].chainBonus);
         BulletsArr_Update(&game->bullets);
     }
@@ -522,7 +523,7 @@ void Game_Update(Game* game, int* inMenu, int mouseClicked) {
 	    else
 	        game->chain[1].speed = game->settings->ballSpd;
 	}
-    
+  
     BulletsArr_CollideWithChainUpdate(&game->bullets, &game->chain[0], game->lvl->spiral);
     if(game->lvl->spiral2 != NULL)
 		BulletsArr_CollideWithChainUpdate(&game->bullets, &game->chain[1], game->lvl->spiral2);

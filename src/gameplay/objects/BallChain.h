@@ -35,10 +35,10 @@
 
 enum BallType{
 	BALL_TYPE_NORMAL,
-	BALL_TYPE_PAUSE,
+	BALL_TYPE_PRECISION,
 	BALL_TYPE_EXPLOSIVE,
 	BALL_TYPE_BACKWARD,
-	BALL_TYPE_LASER
+	BALL_TYPE_PAUSE
 };
 
 typedef struct _Ball {
@@ -47,7 +47,7 @@ typedef struct _Ball {
 		isSingle, inTunnel, drawPrority, startAnim;
 	float pos, x, y, dx, dy, spd;
 	int combo;
-	BallType ballType;
+	enum BallType type;
 	double ang;
 	Animation anim;
 } Ball;
@@ -60,6 +60,7 @@ typedef struct _BallChain {
 	int chainBonus, maxChainBonus;
 	int maxCombo, totalCombos;
 	int ballColors;
+	int specialBalls;
 	bool colorInChain[6], isGenerating, isEndReached, isGlowing;
 	clock_t glowTime;
 	Animation ballShadow;

@@ -19,6 +19,8 @@ void Ball_Init(Ball* ball, float pos, float x, float y, char isPusher,
 	ball->isSingle = 0;
 	ball->ang = 0;
 	ball->startAnim = false;
+	ball->type = BALL_TYPE_NORMAL;
+	//if(color==2) ball->type = BALL_TYPE_PAUSE; //if(ball->color!=2)printf("\ninit type: %d",ball->type);fflush(stdout);}//test
 	
 	Ball_InitAnim(ball);
 }
@@ -28,15 +30,21 @@ void Ball_InitAnim(Ball* ball) {
 	Animation_Init(&ball->anim, TEX_GAME_OBJECTS, animBallRect);
 	if (ball->startAnim)
 		ball->anim.color.a = 0;
-	if (ball->color == 0)
-		Animation_Set(&ball->anim, 0, 47, 0);
-	else 
-		Animation_Set(&ball->anim, 0, 50, 0);
+	//if (ball->color == 0)
+	//	Animation_Set(&ball->anim, 0, 47, 0);
+	//else 
+		Animation_Set(&ball->anim, 0, 54, 0);
 }
 
 void Ball_Draw(Ball* ball) {
-	if (!ball->isExploding)
-		Animation_SetFrame(&ball->anim, ((int)ball->pos) % ball->anim.endFrame);
+	int totalFrameNum = 50;
+	if(ball->color==0)
+		totalFrameNum = 47; //blue has 3 frames less for some reason
+
+	if (!ball->isExploding && ball->type == BALL_TYPE_NORMAL)
+		Animation_SetFrame(&ball->anim, ((int)ball->pos) % totalFrameNum);
+	else if(!ball->isExploding && ball->type != BALL_TYPE_NORMAL)
+		Animation_SetFrame(&ball->anim, 49+ball->type);//from frame 50 start special ball types
 
 	if (ball->startAnim) {
 		ball->anim.color.a+=15;
@@ -67,6 +75,7 @@ void Ball_Copy(Ball* src, Ball* dst) {
 	dst->inTunnel = src->inTunnel;
 	dst->drawPrority = src->drawPrority;
 	dst->startAnim = src->startAnim;
+	dst->type = src->type;
 }
 
 //////////////////////////////////////////////////////////////
@@ -86,12 +95,14 @@ void BallChain_Init(BallChain* ballChain, SDL_FPoint spiral_start, LevelSettings
 	ballChain->isEndReached = 0;
 	ballChain->isGlowing = 0;
 	ballChain->chainBonus = 0;
+	ballChain->specialBalls = 0;
 	
 	ballChain->maxChainBonus = 0;
 	ballChain->totalCombos = 0;
 
 	ballChain->startX = spiral_start.x;
 	ballChain->startY = spiral_start.y;
+	
 
 	ballChain->ballColors = settings->ballColors;
 
@@ -138,9 +149,9 @@ char BallChain_CollidesFront(BallChain* ballChain, int idx, int collideDist) {
 void BallChain_Append(BallChain* ballChain, SDL_FPoint spiral_start, LevelSettings* settings) {
 	bool isSingle = 0;
 	char color;
-	if(ballChain->len == 0)
+	/*if(ballChain->len == 0)
 		color = randInt(0, ballChain->ballColors - 1);
-	else if (ballChain->balls[ballChain->len-1].isSingle) {
+	else*/ if (ballChain->balls[ballChain->len-1].isSingle) {
 		color = ballChain->balls[ballChain->len-1].color;
 		while (color == ballChain->balls[ballChain->len-1].color)
 			color = randInt(0, ballChain->ballColors - 1);
@@ -187,6 +198,15 @@ void BallChain_Update(BallChain* ballChain, SpiralDot* spiral, int spiralLen, in
 		if (delta > BALLCHAIN_BLINK_TIME)
 			ballChain->isGlowing = 0;
 	}
+	
+	//special ball code:
+	if(randInt(0,100)==0){//not good rand code fixme
+		if(ballChain->specialBalls<2){
+			ballChain->balls[randInt(0,ballChain->len-1)].type = BALL_TYPE_PAUSE; 
+			ballChain->specialBalls++;
+		}
+	}
+	
 	//movement code I suppose (applies per ball duuh)
 	for (int i = ballChain->len-1; i >= 0; i--) {
 		Ball* ball = &ballChain->balls[i];
@@ -457,6 +477,9 @@ void BallChain_ExplodeBalls(BallChain* ballChain, int start, int end) {
 		Animation_Set(ballAnim, 0, 16, BALL_EXPLODE_SPEED);
 
 		ballChain->balls[i].isExploding = 1;
+		
+		if(ballChain->balls[i].type != BALL_TYPE_NORMAL)
+			ballChain->specialBalls--;
 	}
 
 	float comboPitch = 0;
