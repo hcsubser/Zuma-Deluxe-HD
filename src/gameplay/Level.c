@@ -448,7 +448,11 @@ int Level_Load(Level* level) {
         level->spiral[i].t2 = t2;
         level->spiral[i].dx = (float)x / 100.0;
         level->spiral[i].dy = (float)y / 100.0;
-    }
+        if(i<40){
+    		printf("(Debug) raw bytes: x=%lf y=%lf t1=%d t2=%d\n",level->spiral[i].dx, level->spiral[i].dy, (int)t1, (int)t2);
+			fflush(stdout);   
+		}
+	}
 
     fclose(file);
 	//spiral2

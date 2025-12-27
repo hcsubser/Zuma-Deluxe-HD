@@ -35,6 +35,15 @@ typedef struct _Treasure {
 	clock_t   time;
 	Animation anim;
 } Treasure;
+
+typedef struct _SpecialBallLogic {
+	
+	clock_t timer;
+	int count;
+	int specialBalls[1];
+	
+} SpecialBallLogic;
+
 typedef struct _Game {
 	int mx, my, stageID, lvlID, score, lives, difficulty;
 	int ballsOnStart;
@@ -60,6 +69,8 @@ typedef struct _Game {
 
 	int totalCoins;
 	Treasure treasure;
+	
+	SpecialBallLogic specialBallLogic;
 
 	SDL_FPoint finishPos;
 	SDL_FPoint finish2Pos;
@@ -85,6 +96,9 @@ void Game_Update(Game*, int*, int);
 void Game_UpdateTreasure(Game*);
 void Game_UpdateOutro(Game*);
 void Game_UpdateIntro(Game*);
+
+void Game_UpdateSpecialBalls(Game*);
+
 
 void Game_Draw(Game*);
 void Game_DrawTreasure(Game*);

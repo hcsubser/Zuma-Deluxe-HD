@@ -1,5 +1,8 @@
 # Zuma-Deluxe-HD-24
 
+##
+Abandoned in favor of [decomp ported to Linux](https://www.github.com/hcsubser/circleshootapp-linux)
+
 ## Fork Info
 This should compile on any reasonable platform. (OK, probably not windows, but if that's the case- please, report a bug.)
 Anyhoo, you'll probably still need to change the `CMakeLists.txt` file to search in the proper paths for your system.

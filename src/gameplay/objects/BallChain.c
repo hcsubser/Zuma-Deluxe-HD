@@ -96,6 +96,7 @@ void BallChain_Init(BallChain* ballChain, SDL_FPoint spiral_start, LevelSettings
 	ballChain->isGlowing = 0;
 	ballChain->chainBonus = 0;
 	ballChain->specialBalls = 0;
+	ballChain->isSlowedDown = 0;
 	
 	ballChain->maxChainBonus = 0;
 	ballChain->totalCombos = 0;
@@ -194,18 +195,26 @@ void BallChain_Append(BallChain* ballChain, SDL_FPoint spiral_start, LevelSettin
 void BallChain_Update(BallChain* ballChain, SpiralDot* spiral, int spiralLen, int* score, Messages* msgs) {
 	//glowing is when "ZUMA" sound is played
 	if (ballChain->isGlowing) {
-		float delta = ((float)(clock() - ballChain->glowTime))/CLOCKS_PER_SEC*1.6;//tryna make it as close as possible to original
+		float delta = ((float)(clock() - ballChain->glowTime))/CLOCKS_PER_SEC;//trying to make it as close as possible to original
 		if (delta > BALLCHAIN_BLINK_TIME)
 			ballChain->isGlowing = 0;
 	}
 	
+	if (ballChain->isSlowedDown) {
+		float delta = ((float)(clock() - ballChain->slowedDownTime))/CLOCKS_PER_SEC;//trying to make it as close as possible to original
+		printf("\nsloweddown: %lf",delta);fflush(stdout);
+		if (delta > BALLCHAIN_SLOWDOWN_TIME)
+			ballChain->isSlowedDown = 0;
+	}
+	
+	//FIXME: veeeeeery buggy
 	//special ball code:
-	if(randInt(0,100)==0){//not good rand code fixme
-		if(ballChain->specialBalls<2){
+	/*if(ballChain->specialBalls<2){
+		if(randInt(0,1000)==0){//not good rand code fixme
 			ballChain->balls[randInt(0,ballChain->len-1)].type = BALL_TYPE_PAUSE; 
 			ballChain->specialBalls++;
 		}
-	}
+	}*/
 	
 	//movement code I suppose (applies per ball duuh)
 	for (int i = ballChain->len-1; i >= 0; i--) {
@@ -213,6 +222,8 @@ void BallChain_Update(BallChain* ballChain, SpiralDot* spiral, int spiralLen, in
 		
 		if(ballChain->isGlowing)
 			ball->spd= -ballChain->speed*2;
+		//if(ballChain->isSlowedDown) // this slows everything (including balls hitting backwards)
+		//	ball->spd= 0.2;
 
 		if (i == ballChain->len-1 && !ballChain->isGlowing) {
 			if (ballChain->speed == ROLLING_TO_PIT_SPEED)
@@ -222,10 +233,14 @@ void BallChain_Update(BallChain* ballChain, SpiralDot* spiral, int spiralLen, in
 
 			if (ball->spd > ballChain->speed)
 				ball->spd = ballChain->speed;
+				
+			if(ballChain->isSlowedDown) //think this gose here, hopefully
+				ball->spd= 0.2;
 
 		} else {
 			Ball* preBall = &ballChain->balls[i+1];
 			if (BallChain_CollidesBack(ballChain, i, BALLS_CHAIN_PAD_ROUGH)) {
+				
 				if (ball->goBack) {
 					for (int j = i; j < ballChain->len; j++) {
 						ballChain->balls[j].spd = ballChain->balls[i].spd / BALL_WEIGHT_RATIO;
@@ -478,8 +493,13 @@ void BallChain_ExplodeBalls(BallChain* ballChain, int start, int end) {
 
 		ballChain->balls[i].isExploding = 1;
 		
-		if(ballChain->balls[i].type != BALL_TYPE_NORMAL)
+		if(ballChain->balls[i].type != BALL_TYPE_NORMAL){
+			Engine_PlaySound(SND_SLOWDOWN1);
 			ballChain->specialBalls--;
+			ballChain->isSlowedDown=1;
+			ballChain->slowedDownTime = clock();
+
+		}
 	}
 
 	float comboPitch = 0;
@@ -535,6 +555,8 @@ void BallChain_Destroy(BallChain* ballChain, int start, int end) {
 	int amount = end - start + 1;
 	ballChain->len -= amount;
 	for (int i=start; i < ballChain->len; i++){
+		//if(ballChain->balls[i].type != BALL_TYPE_NORMAL)
+		//	ballChain->specialBalls--;
 		Ball_Copy(&ballChain->balls[i+amount], &ballChain->balls[i]);
 	}
 }
@@ -554,6 +576,7 @@ void BallChain_Insert(BallChain* ballChain, int idx, char color, bool isInsertBa
 		if (!BallChain_CollidesBack(ballChain, idx, BALLS_CHAIN_PAD)) {
 			ballChain->balls[idx].pos = ballChain->balls[idx-1].pos - BALLS_CHAIN_PAD;
 		} else {
+			//printf("\ninsert front");fflush(stdout);
 			ballChain->balls[idx].pos = ballChain->balls[idx-1].pos;
 			ballChain->balls[idx].x = ballChain->balls[idx-1].x;
 			ballChain->balls[idx].y = ballChain->balls[idx-1].y;
@@ -562,6 +585,9 @@ void BallChain_Insert(BallChain* ballChain, int idx, char color, bool isInsertBa
 
 
 	ballChain->balls[idx].color = color;
+	ballChain->balls[idx].type = BALL_TYPE_NORMAL;
+	//ballChain->balls[idx-1].type = BALL_TYPE_NORMAL;
+
 	ballChain->balls[idx].isExploding = 0;
 	ballChain->balls[idx].isInserted = 1;
 

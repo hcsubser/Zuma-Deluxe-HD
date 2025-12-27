@@ -458,6 +458,11 @@ void Game_Update(Game* game, int* inMenu, int mouseClicked) {
 	        //Engine_PlaySound(SND_CHANT4);
 		}
 	}
+	
+    /*if (game->chain[0].isSlowedDown) {
+		game->chain[0].slowedDownTime = clock();
+	}*/
+
 
     _Game_GenerateChain(game,0);
     if(game->lvl->spiral2!=NULL)
@@ -530,6 +535,7 @@ void Game_Update(Game* game, int* inMenu, int mouseClicked) {
 
     Messages_Update(&game->msgs);
     Game_UpdateTreasure(game);
+    Game_UpdateSpecialBalls(game);
 }
 
 void Game_Draw(Game* game) {
@@ -673,6 +679,30 @@ void Game_UpdateTreasure(Game* game) {
                 Messages_NewMsg(&game->msgs, txt, coinX, coinY, FONT_CANCUN_FLOAT_14, 2);
                 Engine_PlaySound(SND_COINGRAB);
             }
+        }
+    }
+}
+
+void Game_UpdateSpecialBalls(Game* game) {
+    clock_t t = clock();
+    float delta = ((float)(t - game->specialBallLogic.timer)) / CLOCKS_PER_SEC;
+
+	printf("\ndelta: %lf count: %d ",delta,game->specialBallLogic.count);
+    if (game->specialBallLogic.count>0) {
+        if (delta > 2) {
+			game->chain[0].balls[game->specialBallLogic.specialBalls[0]].type = BALL_TYPE_NORMAL;
+			game->specialBallLogic.count -= 1;
+            game->specialBallLogic.timer = t;
+        }
+
+    } else {
+        if (delta > 4) {
+            Engine_PlaySound(SND_ACCURACY3);//debug sound
+            game->specialBallLogic.count += 1;
+            //game->specialBallLogic.specialBalls[0] = malloc(sizeof(Ball)); //not work need another way
+            game->specialBallLogic.specialBalls[0] = randInt(0,game->chain[0].len-1);// not perfect
+            game->chain[0].balls[game->specialBallLogic.specialBalls[0]].type = BALL_TYPE_PAUSE;
+            game->specialBallLogic.timer = t;
         }
     }
 }

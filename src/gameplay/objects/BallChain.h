@@ -31,6 +31,9 @@
 #define BALLCHAIN_BLINK_TIME 0.5
 #define BALLCHAIN_BLINK_SPEED 4
 
+#define BALLCHAIN_SLOWDOWN_TIME 0.75 //1 = 4 seconds, 2 = 8 seconds...
+
+
 #define RAD_TO_DEG 180/M_PI
 
 enum BallType{
@@ -61,8 +64,8 @@ typedef struct _BallChain {
 	int maxCombo, totalCombos;
 	int ballColors;
 	int specialBalls;
-	bool colorInChain[6], isGenerating, isEndReached, isGlowing;
-	clock_t glowTime;
+	bool colorInChain[6], isGenerating, isEndReached, isGlowing, isSlowedDown;
+	clock_t glowTime, slowedDownTime;
 	Animation ballShadow;
 } BallChain;
 
